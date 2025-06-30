@@ -9,7 +9,7 @@
             <a href="index_admin.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'dashboard.php') echo ' bg-secondary'; ?>">
                 <i class="bi bi-house-door me-2"></i> Tableau de bord
             </a>
-            <a href="reservation.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'reservation.php') echo ' bg-secondary'; ?>">
+            <a href="mes_reservations.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'reservation.php') echo ' bg-secondary'; ?>">
                 <i class="bi bi-calendar-check me-2"></i> Réservations
             </a>
             <a href="produit.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'produit.php') echo ' bg-secondary'; ?>">

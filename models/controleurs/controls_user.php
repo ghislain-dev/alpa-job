@@ -68,6 +68,7 @@ if (isset($_POST['ajouter'])) {
     }
 }
 
+
 // Traitement de la suppression
 if (isset($_GET['sup'])) {
     $id = intval($_GET['sup']);
@@ -78,6 +79,7 @@ if (isset($_GET['sup'])) {
     } else {
         echo "Échec de suppression.";
     }
+    
 }
 
 ?>

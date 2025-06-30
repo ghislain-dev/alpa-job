@@ -84,5 +84,16 @@
             }
             return $donnes;
         }
+
+        public function getClientById($id_client) {
+            $sql = "SELECT `id_client`, `nom`, `email`, `numero`, `genre` FROM `client` WHERE id_client = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute([$id_client]);
+            return $stmt->fetch(PDO::FETCH_ASSOC);
+        }
+
+       
+
+
     }
 ?>

@@ -50,12 +50,12 @@ class Reservation {
     // Modification d'une réservation existante
     public function update(): bool {
         $sql = "UPDATE reservation 
-                SET description = ?, date = ?, date_debut = ?, date_fin = ?, id_client = ?, id_salle = ?
+                SET description = ?, date = ?, date_debut = ?, date_fin = ?,  id_salle = ?
                 WHERE id_reservation = ?";
         $stmt = $this->con->prepare($sql);
         return $stmt->execute([
             $this->description, $this->date, $this->date_debut, $this->date_fin,
-            $this->id_client, $this->id_salle, $this->id
+            $this->id_salle, $this->id
         ]);
     }
 
@@ -131,6 +131,70 @@ public function get_reservations_by_client_and_statut_paginated($id_client, $sta
     $stmt->execute();
     return $stmt->fetchAll();
 }
+
+public function payer(): bool {
+    $sql = "UPDATE reservation SET statut = 'payée' WHERE id_reservation = ?";
+    $stmt = $this->con->prepare($sql);
+    return $stmt->execute([$this->id]);
+}
+
+public function enregistrerPaiement($id_reservation, $montant) {
+    $sql = "INSERT INTO paiement_reservation (id_reservation, montant) VALUES (?, ?)";
+    $stmt = $this->con->prepare($sql);
+    return $stmt->execute([$id_reservation, $montant]);
+}
+
+public function getReservationDetails($id) {
+    $sql = "SELECT r.*, s.nom_salle, s.prix AS prix_salle 
+            FROM reservation r 
+            JOIN salle s ON r.id_salle = s.id_salle 
+            WHERE r.id_reservation = ?";
+    $stmt = $this->con->prepare($sql);
+    $stmt->execute([$id]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+public function updateStatut($id_reservation, $statut) {
+    $sql = "UPDATE reservation SET statut = ? WHERE id_reservation = ?";
+    $stmt = $this->con->prepare($sql);
+    return $stmt->execute([$statut, $id_reservation]);
+}
+
+
+
+
+public function getReservationById($id_reservation) {
+    $sql = "SELECT r.*, s.nom_salle, s.prix AS prix_salle
+            FROM reservation r
+            JOIN salle s ON r.id_salle = s.id_salle
+            WHERE r.id_reservation = ?";
+    $stmt = $this->con->prepare($sql);
+    $stmt->execute([$id_reservation]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
+public function getReservationsByStatut(string $statut): array {
+    $sql = "SELECT r.*, s.nom_salle, c.nom AS nom_client, s.prix AS prix_salle
+    FROM reservation r
+    JOIN salle s ON r.id_salle = s.id_salle
+    JOIN client c ON r.id_client = c.id_client
+    WHERE r.statut = ?
+    ORDER BY r.date DESC";
+    
+    $stmt = $this->con->prepare($sql);
+    $stmt->execute([$statut]);
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
+
+public function getClientById($id_client) {
+    $sql = "SELECT id_utilisateur, nom, prenom, email, telephone 
+            FROM utilisateur 
+            WHERE id_utilisateur = ?";
+    $stmt = $this->con->prepare($sql);
+    $stmt->execute([$id_client]);
+    return $stmt->fetch(PDO::FETCH_ASSOC);
+}
+
 
 }
 ?>

@@ -17,13 +17,16 @@ if (session_status() == PHP_SESSION_NONE) {
           <a class="nav-link" href="index_client.php">🏠 Accueil</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="reservations.php">📅 Réservation</a>
+          <a class="nav-link" href="reserver.php">📅 Réservation</a>
+        </li>
+          <li class="nav-item">
+          <a class="nav-link" href="reservations.php">📅 listes de réservation</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="affiche_produit.php">📦 Commandes</a>
         </li>
         <li class="nav-item">
-          <a class="nav-link" href="mes_commandes.php">📦mes Commandes</a>
+          <a class="nav-link" href="mes_commandes.php">📦listes Commandes</a>
         </li>
         <li class="nav-item">
           <a class="nav-link" href="profil.php">👤 Mon Profil</a>

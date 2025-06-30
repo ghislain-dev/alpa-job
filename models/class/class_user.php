@@ -61,6 +61,18 @@
             return $data;
         }
 
+         public function verifierConnexion($email, $motdepasse) {
+            $sql = "SELECT * FROM utilisateur WHERE email = ?";
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute([$email]);
+            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+            if ($user && password_verify($motdepasse, $user['mot_de_passe'])) {
+                return $user;
+            }
+            return false;
+        }
+
         public function get_fonction() :array{
             $query= "SELECT * FROM fonction";
             $stmt=$this->con->prepare($query);

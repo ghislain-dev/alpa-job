@@ -2,6 +2,9 @@
 require_once("../connexion/connexion.php");
 require_once("../models/class/class_produit.php");
 require_once("../models/class/class_stock.php");
+require_once("../models/class/class_reservation.php");
+
+
 use PHPMailer\PHPMailer\PHPMailer;
 use PHPMailer\PHPMailer\Exception;
 require '../vendor/autoload.php';
@@ -9,6 +12,9 @@ require '../vendor/autoload.php';
 $db = new connexion();
 $con = $db->getconnexion();
 $affichage = new produit($con);
+$reservation = new Reservation($con);
+$reservations = $reservation->getReservationsByStatut("payée");
+$total_reservations_payees = count($reservations);
 
 // Récupérer les réapprovisionnements expirés (statut actif seulement)
 $expiredQuery = "SELECT r.*, p.nom_produit, f.noms AS nom_fournisseur
@@ -28,9 +34,10 @@ foreach ($expiredResult as $exp) {
 }
 
 // Stock réel par produit (via vue)
-$sql = "SELECT nom_produit, quantite_totale FROM vue_stock_reel";
+$sql = "SELECT nom_produit, stock_restant FROM vue_stock_fifo";
 $stmt = $con->query($sql);
 $produits = $stmt->fetchAll(PDO::FETCH_ASSOC);
+
 
 // Envoi d'e-mail s'il y a des expirés
 if ($total_expire > 0) {
@@ -45,12 +52,12 @@ if ($total_expire > 0) {
         $mail->isSMTP();
         $mail->Host = 'smtp.gmail.com';
         $mail->SMTPAuth = true;
-        $mail->Username = 'tonadresse@gmail.com'; // À remplacer
-        $mail->Password = 'ton_mot_de_passe_application'; // À remplacer
+         $mail->Username = 'alphajobbutembo@gmail.com';
+        $mail->Password = 'wtvy xeol pddi xtjk';
         $mail->SMTPSecure = 'tls';
         $mail->Port = 587;
 
-        $mail->setFrom('tonadresse@gmail.com', 'Alpa Job Notification');
+        $mail->setFrom('alphajobbutembo@gmail.com', 'Service Paiement Alpa Job');
         $mail->addAddress('destinataire@example.com'); // À remplacer
         $mail->isHTML(true);
         $mail->Subject = 'Alerte : Réapprovisionnements expirés';
@@ -137,9 +144,16 @@ $liste_produits = $con->query("
 
       <div class="row g-4 p-2">
         <div class="col-md-6">
-          <div class="p-3 bg-primary text-white dashboard-card">
-            <h5><i class="bi bi-calendar-check"></i> Réservations</h5>
-            <p class="mb-0">12 réservations en attente</p>
+          <div class="p-3 bg-success text-white dashboard-card">
+            <h5><i class="bi bi-cash"></i> Réservations Payées</h5>
+            <p class="mb-0">
+              <?= $total_reservations_payees ?> réservation(s) payée(s)
+              <?php if ($total_reservations_payees > 0): ?>
+                <button class="btn btn-sm btn-light ms-2" data-bs-toggle="modal" data-bs-target="#modalResPayees">
+                  Voir plus
+                </button>
+              <?php endif; ?>
+            </p>
           </div>
         </div>
         
@@ -207,6 +221,55 @@ $liste_produits = $con->query("
   </div>
 
   
+  <!-- Modal Réservations Payées -->
+<div class="modal fade" id="modalResPayees" tabindex="-1" aria-labelledby="modalResPayeesLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header bg-success text-white">
+        <h5 class="modal-title" id="modalResPayeesLabel">📋 Réservations Payées</h5>
+        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <table class="table table-bordered table-striped table-sm">
+          <thead class="table-success">
+            <tr>
+              <th>#</th>
+              <th>Client</th>
+              <th>Salle</th>
+              <th>Description</th>
+              <th>Date</th>
+              <th>Début</th>
+              <th>Fin</th>
+              <th>Montant payé</th>
+              <th>Statut</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php foreach ($reservations as $i => $res): ?>
+              <tr>
+                <td><?= $i + 1 ?></td>
+                <td><?= htmlspecialchars($res['nom_client']) ?></td>
+                <td><?= htmlspecialchars($res['nom_salle']) ?></td>
+                <td><?= htmlspecialchars($res['description']) ?></td>
+                <td><?= htmlspecialchars($res['date']) ?></td>
+                <td><?= htmlspecialchars($res['date_debut']) ?></td>
+                <td><?= htmlspecialchars($res['date_fin']) ?></td>
+                <td><?= number_format($res['prix_salle'] / 2, 2) ?> FC</td>
+                <td><?= htmlspecialchars($res['statut']) ?></td>
+                <td>
+                  <a href="../models/controleurs/controls_rese.php?stat=<?= htmlspecialchars($res['id_reservation']) ?>" onclick="return confirm('Confirmez-vous que cette réservation est honorée ?');">
+                    <button class="btn btn-success btn-sm">✔️ Honoré</button>
+                  </a>
+                </td>
+              </tr>
+            <?php endforeach; ?>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
 
 
 
@@ -227,14 +290,14 @@ $liste_produits = $con->query("
       <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
       <script>
         const labels = <?= json_encode(array_column($produits, 'nom_produit')) ?>;
-        const data = <?= json_encode(array_column($produits, 'quantite_totale')) ?>;
+        const data = <?= json_encode(array_map('intval', array_column($produits, 'stock_restant'))) ?>;
 
         new Chart(document.getElementById('stockChart'), {
           type: 'bar',
           data: {
             labels: labels,
             datasets: [{
-              label: 'Quantité en stock',
+              label: 'Stock restant par produit',
               data: data,
               backgroundColor: 'rgba(13, 110, 253, 0.7)',
               borderColor: 'rgba(13, 110, 253, 1)',
@@ -248,13 +311,14 @@ $liste_produits = $con->query("
                 beginAtZero: true,
                 title: {
                   display: true,
-                  text: 'Quantité'
+                  text: 'Quantité restante'
                 }
               }
             }
           }
         });
       </script>
+
 
       <div class="mt-5">
         <h5>Activités récentes</h5>

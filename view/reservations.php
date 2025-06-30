@@ -53,7 +53,7 @@ foreach ($statuts as $statut) {
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
 </head>
 <body>
-<?php include('navbar_client.php'); ?>
+<?php include_once('navbar_clientt.php'); ?>
 
 <div class="container mt-5">
     <h3 class="text-center mb-4">🗓️ Mes Réservations par statut</h3>
@@ -94,10 +94,12 @@ foreach ($statuts as $statut) {
                         <td><?= htmlspecialchars($res['date']) ?></td>
                         <td><?= htmlspecialchars($res['date_debut']) ?></td>
                         <td><?= htmlspecialchars($res['date_fin']) ?></td>
+                        <?php if ($statut === 'en cours'): ?>
                         <td>
                             <button
                                 class="btn btn-sm btn-info btn-edit"
                                 data-id="<?= $res['id_reservation'] ?>"
+                                data-salle="<?= $res['id_salle'] ?>"
                                 data-description="<?= htmlspecialchars($res['description']) ?>"
                                 data-date="<?= $res['date'] ?>"
                                 data-debut="<?= $res['date_debut'] ?>"
@@ -107,24 +109,31 @@ foreach ($statuts as $statut) {
                             >✏️ Modifier</button>
                         </td>
                         <td>
-                            <a href="../models/controleurs/controls_reservation.php?sup=<?= $res['id_reservation'] ?>"
-                               onclick="return confirm('Supprimer cette réservation ?')"
-                               class="btn btn-sm btn-danger">🗑️ Supprimer</a>
+                            <a href="../models/controleurs/controls_rese.php?sup=<?= $res['id_reservation'] ?>"
+                            onclick="return confirm('Supprimer cette réservation ?')"
+                            class="btn btn-sm btn-danger">🔚️ Supprimer</a>
                         </td>
-                       
                         <td>
-                            <form method="post" action="../models/controleurs/controls_reservation.php" onsubmit="return confirm('Confirmez-vous le paiement de cette réservation ?');" style="display:inline;">
-                                <input type="hidden" name="payer" value="<?= htmlspecialchars($res['id_reservation']) ?>">
-                                <button type="submit" class="btn btn-sm btn-success">💳 Payer</button>
-                            </form>
+                            <a href="payer_rese.php?id=<?= urlencode($res['id_reservation']) ?>"
+                            class="btn btn-success btn-sm"
+                            onclick="return confirm('Souhaitez-vous vraiment simuler le paiement de cette réservation ?');">
+                            💳 Simuler Paiement
+                            </a>
                         </td>
+                        <?php else: ?>
+                            <td colspan="3" class="text-center text-muted">Aucune action disponible</td>
+                        <?php endif; ?>
+
+                       
+
+                   
+
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
         </div>
 
-        <!-- Pagination spécifique au statut -->
         <nav aria-label="Pagination pour <?= htmlspecialchars($statut) ?>">
             <ul class="pagination justify-content-center">
                 <?php if ($page > 1): ?>
@@ -148,14 +157,14 @@ foreach ($statuts as $statut) {
     <?php endforeach; ?>
 </div>
 
-<!-- Modale de modification (identique à ta version) -->
 <div class="modal fade" id="modalEdit" tabindex="-1" aria-labelledby="modalEditLabel" aria-hidden="true">
     <div class="modal-dialog">
-        <form action="../models/controleurs/controls_reservation.php" method="post" class="modal-content">
+        <form action="../models/controleurs/controls_rese.php" method="post" class="modal-content">
             <div class="modal-header bg-warning">
                 <h5 class="modal-title" id="modalEditLabel">Modifier Réservation</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
+            <input type="hidden" name="salle" id="edit-salle">
             <div class="modal-body">
                 <input type="hidden" name="id_reservation" id="edit-id">
                 <div class="mb-2">
@@ -190,6 +199,7 @@ document.addEventListener('DOMContentLoaded', () => {
     editButtons.forEach(button => {
         button.addEventListener('click', () => {
             document.getElementById('edit-id').value = button.dataset.id;
+            document.getElementById('edit-salle').value = button.dataset.salle;
             document.getElementById('edit-description').value = button.dataset.description;
             document.getElementById('edit-date').value = button.dataset.date;
             document.getElementById('edit-date-debut').value = button.dataset.debut;
