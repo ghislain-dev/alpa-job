@@ -3,11 +3,15 @@ session_start();
 require_once('../connexion/connexion.php');
 require_once('../models/class/class_reservation.php');
 
+
 // Rediriger si l'admin n'est pas connecté
-//if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
-//    header("Location: login.php");
-//    exit();
-//}
+if (isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+  header("Location: login.php");
+    exit();
+}
+
+
+
 
 $db = new connexion();
 $con = $db->getconnexion();
