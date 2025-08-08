@@ -54,7 +54,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
     
     // Redirection vers la page de réservation avec message
-    header("Location: ../../view/reserver.php?message=" . urlencode($msg));
+    header("Location: ../../view/affiche_produit.php?message=" . urlencode($msg));
     exit();
 }
 ?>

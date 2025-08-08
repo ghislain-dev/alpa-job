@@ -15,6 +15,16 @@
             <a href="produit.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'produit.php') echo ' bg-secondary'; ?>">
                 <i class="bi bi-box me-2"></i> Produits
             </a>
+            <a href="categorie.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'categorie.php') echo ' bg-secondary'; ?>">
+                <i class="bi bi-box me-2"></i> categories
+            </a>
+              <a href="prix.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'prix.php') echo ' bg-secondary'; ?>">
+                <i class="bi bi-box me-2"></i> Fix le prix
+            </a>
+            <a href="reapro.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'reapro.php') echo ' bg-secondary'; ?>">
+                <i class="bi bi-box me-2"></i> reapprovisionnement
+            </a>
+            
             <a href="stock.php" class="d-flex align-items-center">
                 <i class="bi bi-layers me-2"></i> Mouvements de stock
             </a>
@@ -25,9 +35,7 @@
             <a href="user.php" class="d-flex align-items-center">
                 <i class="bi bi-people me-2"></i> Utilisateurs
             </a>
-            <a href="rapport.php" class="d-flex align-items-center<?php if(basename($_SERVER['PHP_SELF']) == 'rapport.php') echo ' bg-secondary'; ?>">
-                <i class="bi bi-bar-chart-line me-2"></i> Rapports
-            </a>
+            
             <a href="deconnexion.php" class="d-flex align-items-center mt-2">
                 <i class="bi bi-box-arrow-right me-2"></i> Déconnexion
             </a>

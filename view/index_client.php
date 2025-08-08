@@ -41,12 +41,8 @@ $image= $_SESSION['photo'];
         <p class="text-center text-muted">Email : <?= htmlspecialchars($email) ?></p>
 
         <div class="row text-center mt-4">
-            <div class="col-md-6 mb-3">
-                <a href="reserver.php" class="btn btn-success w-100">📅 Faire une réservation</a>
-            </div>
-            <div class="col-md-6 mb-3">
-                <a href="commentaire.php" class="btn btn-primary w-100">💬 Laisser un commentaire</a>
-            </div>
+        
+           
         </div>
     </div>
 </div>

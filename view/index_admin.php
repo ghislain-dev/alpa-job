@@ -1,4 +1,13 @@
 <?php
+session_start();
+
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+   
+    header("Location: login.php");
+    exit();
+}
+
+$email = $_SESSION['email'];
 require_once("../connexion/connexion.php");
 require_once("../models/class/class_produit.php");
 require_once("../models/class/class_stock.php");
@@ -58,7 +67,7 @@ if ($total_expire > 0) {
         $mail->Port = 587;
 
         $mail->setFrom('alphajobbutembo@gmail.com', 'Service Paiement Alpa Job');
-        $mail->addAddress('destinataire@example.com'); // À remplacer
+        $mail->addAddress($email); // À remplacer
         $mail->isHTML(true);
         $mail->Subject = 'Alerte : Réapprovisionnements expirés';
         $mail->Body    = $message;
@@ -320,14 +329,7 @@ $liste_produits = $con->query("
       </script>
 
 
-      <div class="mt-5">
-        <h5>Activités récentes</h5>
-        <ul class="list-group">
-          <li class="list-group-item">🔁 Mise à jour du stock de "Chaise plastique"</li>
-          <li class="list-group-item">📦 Nouveau produit ajouté : "Tente 6m x 6m"</li>
-          <li class="list-group-item">📅 Réservation confirmée pour le 24 juin</li>
-        </ul>
-      </div>
+
 
       <?php if ($total_expire > 0): ?>
         <div class="modal fade" id="modalProduitsExpires" tabindex="-1" aria-labelledby="modalProduitsExpiresLabel" aria-hidden="true">

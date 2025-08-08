@@ -105,11 +105,11 @@ if (isset($_POST['simuler'])) {
                 $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
                 // 🔄 Récupération des détails de la commande avec nom et prix produit
-                $produitsDetails = $con->prepare("SELECT p.nom_produit, p.image, pr.montant AS prix_unitaire, d.quantite 
-                                                  FROM details_commande d
-                                                  JOIN produit p ON d.id_produit = p.id_produit
-                                                  JOIN prix pr ON pr.id_produit = p.id_produit
-                                                  WHERE d.id_commande = ?");
+                $produitsDetails = $con->prepare("SELECT cd.*, p.nom_produit, pr.montant
+                    FROM details_commande cd
+                    JOIN produit p ON cd.id_produit = p.id_produit
+                    JOIN prix pr ON pr.id_prix = p.id_prix
+                    WHERE cd.id_commande = ?");
                 $produitsDetails->execute([$id_commande]);
                 $listeProduits = $produitsDetails->fetchAll(PDO::FETCH_ASSOC);
 
@@ -144,12 +144,12 @@ if (isset($_POST['simuler'])) {
                 $n = 1;
                 $total = 0;
                 foreach ($listeProduits as $item) {
-                    $sous_total = $item['prix_unitaire'] * $item['quantite'];
+                    $sous_total = $item['montant'] * $item['quantite'];
                     $html .= "<tr>
                                 <td>{$n}</td>
                                 <td>" . htmlspecialchars($item['nom_produit']) . "</td>
                                 <td>{$item['quantite']}</td>
-                                <td>{$item['prix_unitaire']} {$devise}</td>
+                                <td>{$item['montant']} {$devise}</td>
                                 <td>{$sous_total} {$devise}</td>
                               </tr>";
                     $n++;
@@ -219,7 +219,12 @@ if (isset($_POST['simuler'])) {
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
+    <head>
+        <?php require_once('navbar_clientt.php')  ?>
+    </head>
+    
 <div class="container mt-5">
+    
   <h2>💰 Simulation de Paiement</h2>
 
   <?php if (!empty($erreur)): ?>

@@ -34,6 +34,9 @@
 </head>
 <body>
 
+<?php
+  require_once('nav.php');
+?>
   <div class="register-container">
     <div class="text-center mb-4">
       <i class="bi bi-person-plus" style="font-size: 3rem; color: #0083b0;"></i>

@@ -16,64 +16,70 @@
   <meta charset="UTF-8" />
   <title>Liste des Réapprovisionnements</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+  <link rel="stylesheet" href="css/nav_admin.css">
 </head>
 <body>
+<div class="container-fluid bg-light ">
+    <div class="row align-items-center">
+      <?php include_once("nav_admin.php") ?>
+      <div class="col-md-8 col-lg-9 p-4">
+        <h2>Liste des Réapprovisionnements</h2>
 
-<div class="container mt-4">
-  <h2>Liste des Réapprovisionnements</h2>
+        <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalReappro">Ajouter un réapprovisionnement</button>
 
-  <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalReappro">Ajouter un réapprovisionnement</button>
+        <table class="table table-bordered table-striped mt-3 align-middle">
+          <thead class="table-primary">
+            <tr>
+              <th>#</th>
+              <th>Produit</th>
+              <th>Fournisseur</th>
+              <th>Quantité ajoutée</th>
+              <th>Date quantité</th>
+              <th>Date d'expiration</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <?php if (count($reappros) > 0): ?>
+              <?php $i = 1; foreach ($reappros as $r): ?>
+                <tr>
+                  <td><?= $i++ ?></td>
+                  <td><?= htmlspecialchars($r['nom_produit']) ?></td>
+                  <td><?= htmlspecialchars($r['nom_fournisseur']) ?></td>
+                  <td><?= htmlspecialchars($r['quantite_ajoutee']) ?></td>
+                  <td><?= htmlspecialchars($r['date_entre']) ?></td>
+                  <td><?= htmlspecialchars($r['date_exp']) ?></td>
+                  
+                  <td>
+                    <button 
+                      class="btn btn-sm btn-warning btnEdit" 
+                      data-id="<?= $r['id_reapprovisionnement'] ?>"
+                      data-quantite="<?= $r['quantite_ajoutee'] ?>"
+                      
+                      data-dateexp="<?= $r['date_exp'] ?>"
+                      data-produit="<?= $r['nom_produit'] ?>"
+                      data-idproduit="<?= $r['id_produit'] ?>"
+                      data-fournisseur="<?= $r['nom_fournisseur'] ?>"
+                      data-idfournisseur="<?= $r['id_fournisseur'] ?? '' ?>"
+                      data-bs-toggle="modal" data-bs-target="#modalReappro"
+                    >Modifier</button>
+                    <a href="../controllers/controls_reapprovisionnement.php?sup=<?= $r['id_reapprovisionnement'] ?>" 
+                      onclick="return confirm('Voulez-vous vraiment supprimer ce réapprovisionnement ?');"
+                      class="btn btn-sm btn-danger"
+                    >Supprimer</a>
+                  </td>
+                </tr>
+              <?php endforeach; ?>
+            <?php else: ?>
+              <tr><td colspan="7" class="text-center">Aucun réapprovisionnement trouvé.</td></tr>
+            <?php endif; ?>
+          </tbody>
+        </table>
 
-  <table class="table table-bordered table-striped mt-3 align-middle">
-    <thead class="table-primary">
-      <tr>
-        <th>#</th>
-        <th>Produit</th>
-        <th>Fournisseur</th>
-        <th>Quantité ajoutée</th>
-        <th>Date quantité</th>
-        <th>Date d'expiration</th>
-        <th>Actions</th>
-      </tr>
-    </thead>
-    <tbody>
-      <?php if (count($reappros) > 0): ?>
-        <?php $i = 1; foreach ($reappros as $r): ?>
-          <tr>
-            <td><?= $i++ ?></td>
-            <td><?= htmlspecialchars($r['nom_produit']) ?></td>
-            <td><?= htmlspecialchars($r['nom_fournisseur']) ?></td>
-            <td><?= htmlspecialchars($r['quantite_ajoutee']) ?></td>
-            <td><?= htmlspecialchars($r['date_entre']) ?></td>
-            <td><?= htmlspecialchars($r['date_exp']) ?></td>
-            
-            <td>
-              <button 
-                class="btn btn-sm btn-warning btnEdit" 
-                data-id="<?= $r['id_reapprovisionnement'] ?>"
-                data-quantite="<?= $r['quantite_ajoutee'] ?>"
-                
-                data-dateexp="<?= $r['date_exp'] ?>"
-                data-produit="<?= $r['nom_produit'] ?>"
-                data-idproduit="<?= $r['id_produit'] ?>"
-                data-fournisseur="<?= $r['nom_fournisseur'] ?>"
-                data-idfournisseur="<?= $r['id_fournisseur'] ?? '' ?>"
-                data-bs-toggle="modal" data-bs-target="#modalReappro"
-              >Modifier</button>
-              <a href="../controllers/controls_reapprovisionnement.php?sup=<?= $r['id_reapprovisionnement'] ?>" 
-                 onclick="return confirm('Voulez-vous vraiment supprimer ce réapprovisionnement ?');"
-                 class="btn btn-sm btn-danger"
-              >Supprimer</a>
-            </td>
-          </tr>
-        <?php endforeach; ?>
-      <?php else: ?>
-        <tr><td colspan="7" class="text-center">Aucun réapprovisionnement trouvé.</td></tr>
-      <?php endif; ?>
-    </tbody>
-  </table>
-
-  <a href="dashboard.php" class="btn btn-secondary mt-3">Retour au tableau de bord</a>
+        <a href="dashboard.php" class="btn btn-secondary mt-3">Retour au tableau de bord</a>
+      </div>
+    </div>
 </div>
 
 <!-- Modal ajout / modification -->

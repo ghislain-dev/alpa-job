@@ -60,10 +60,10 @@
 
         if($class_client->delete_client()){
             $msg=$_GET['la suppression est effectue avec succes '];
-            header("location:../../view/categorie.php");
+            header("location:../../view/categorie.php?message=$msg");
         }else{
             $msg=$_GET['eche de la suppression'];
-            header("location:../../view/categorie.php");
+            header("location:../../view/categorie.php?message=$msg");
         }
     }
 ?>

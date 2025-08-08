@@ -41,7 +41,7 @@
 <body>
 
   <!-- NAVBAR -->
-  <?php include_once('navbar_client.php'); ?>
+  <?php include_once('nav_inter.php'); ?>
 
   <!-- FORMULAIRE -->
   <div class="register-container mt-4">

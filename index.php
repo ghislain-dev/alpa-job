@@ -27,22 +27,12 @@
 <body>
 
 <!-- Navbar -->
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top shadow">
-  <div class="container">
-    <a class="navbar-brand" href="#">Alpa Job</a>
-    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#menu">
-      <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="menu">
-      <ul class="navbar-nav ms-auto">
-        <li class="nav-item"><a class="nav-link active" href="#">Accueil</a></li>
-        <li class="nav-item"><a class="nav-link" href="#services">Services</a></li>
-        <li class="nav-item"><a class="nav-link" href="view/contact.php">Contact</a></li>
-        <li class="nav-item"><a class="btn btn-outline-light ms-2" href="#">Connexion</a></li>
-      </ul>
-    </div>
-  </div>
-</nav>
+
+<?php
+  require_once('nav.php');
+?>
+
+
 
 <!-- Carousel -->
 
@@ -156,9 +146,10 @@
   <div class="container text-center">
     <h2 class="mb-3">Contactez-nous</h2>
     <p>Pour toute question ou besoin d’assistance, notre équipe est à votre écoute.</p>
-   	<button class="btn btn-primary mt-2" data-bs-toggle="modal" data-bs-target="#messageModal">
+   
+    <a href="view/contact.php">	<button class="btn btn-primary mt-2">
  		<i class="bi bi-envelope"></i> Écrire un message
-	</button>
+	</button></a>
 
   </div>
 </section>

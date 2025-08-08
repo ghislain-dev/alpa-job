@@ -24,6 +24,18 @@
         <div class="row g-4">
             <?php if(empty($_GET['modifier'])) : ?>
                 <div class="col-md-4">
+                    <?php if (isset($_GET['message']) && !empty($_GET['message'])): ?>
+                        <div style="padding: 10px; margin: 15px 0; border-radius: 5px;
+                                    color: white;
+                                    background-color: 
+                                        <?php 
+                                            // Couleur rouge si message contient "échec" (insensible à la casse), vert sinon
+                                            echo (stripos($_GET['message'], 'échec') !== false) ? '#e74c3c' : '#27ae60';
+                                        ?>">
+                            <?= htmlspecialchars($_GET['message']) ?>
+                        </div>
+                    <?php endif; ?>
+
                     <div class="card shadow-sm">
                         <div class="card-header bg-primary text-white">
                             <h6 class="mb-0">Ajouter une fonction</h6>

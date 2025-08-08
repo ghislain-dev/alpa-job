@@ -1,4 +1,11 @@
 <?php 
+session_start();
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de login
+    header("Location: login.php");
+    exit();
+}
+
 require_once('../connexion/connexion.php');
 
 $db = new connexion();

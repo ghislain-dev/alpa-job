@@ -1,75 +1,79 @@
 <?php
-    class prix{
-        private $id;
-        private $montant;
-      
-        private $con;
+class prix {
+    private $id;
+    private $montant;
+    private $con;
 
-        public function __construct($con){
-            $this->con=$con;
-        }
+    public function __construct($con) {
+        $this->con = $con;
+    }
 
-        //declararion des accesseurq 
+    // Accesseurs
+    public function set_id($id): void { $this->id = $id; }
+    public function set_montant($montant): void { $this->montant = $montant; }
 
-        public function set_id($id) : void{$this->id=$id;}
-        public function set_montant($montant) : void{$this->montant=$montant;}
-        
-
-        //declaration d'une methode 
-
-        public function add_prix() : bool{
-            $query ="INSERT INTO prix(montant) values(?)";
-            $stmt =$this->con->prepare($query);
-            if($stmt->execute([$this->montant])){
-                return true;
-            }
+    // Ajouter un prix
+    public function add_prix(): bool {
+        try {
+            $query = "INSERT INTO prix(montant) VALUES(?)";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->montant]);
+        } catch (PDOException $e) {
+            // Optionnel : error_log($e->getMessage());
             return false;
-        }
-        
-        public function update_prix() :bool{
-            $query="UPDATE prix set montant =? where id_prix=?";
-            $stmt=$this->con->prepare($query);
-            if($stmt->execute([$this->montant,$this->id])){
-                return true;
-            }
-            return false;
-        }
-
-        public function get_prix() :array{
-            $query= "SELECT * FROM prix";
-            $stmt=$this->con->prepare($query);
-            $stmt->execute([]);
-
-            $data =[];
-
-            while($dat=$stmt->fetch()){
-                $data[]= $dat;
-            }
-            return $data;
-        }
-
-        public function delete_prix(){
-            $query="DELETE FROM prix where id_prix =?";
-            $stmt=$this->con->prepare($query);
-            $stmt->execute([$this->id]);
-            
-            $donnes =[];
-            while($data =$stmt->fetch()){
-                $donnes []=$data;
-            }
-            return $donnes;
-        }
-
-        public function get_prix_by_id($id){
-            $query="SELECT * FROM prix WHERE id_prix =? ";
-            $stmt =$this->con->prepare($query);
-            $stmt->execute([$id]);
-    
-            $donnes =[];
-            while($data =$stmt->fetch()){
-                $donnes [] =$data;
-            }
-            return $donnes;
         }
     }
+
+    // Modifier un prix
+    public function update_prix(): bool {
+        try {
+            $query = "UPDATE prix SET montant = ? WHERE id_prix = ?";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->montant, $this->id]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    // Récupérer tous les prix
+    public function get_prix(): array {
+        try {
+            $query = "SELECT * FROM prix";
+            $stmt = $this->con->prepare($query);
+            $stmt->execute();
+
+            $data = [];
+            while ($dat = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $data[] = $dat;
+            }
+            return $data;
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    // Supprimer un prix
+    public function delete_prix(): bool {
+        try {
+            $query = "DELETE FROM prix WHERE id_prix = ?";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->id]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    // Récupérer un prix par ID
+    public function get_prix_by_id($id): ?array {
+        try {
+            $query = "SELECT * FROM prix WHERE id_prix = ?";
+            $stmt = $this->con->prepare($query);
+            $stmt->execute([$id]);
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $data ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+}
 ?>

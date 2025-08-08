@@ -1,5 +1,11 @@
 <?php
 session_start();
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de login
+    header("Location: login.php");
+    exit();
+}
+
 require_once('../connexion/connexion.php');
 
 $db = new connexion();
@@ -114,7 +120,7 @@ foreach ($resultats as $row) {
                                         <th>Image</th>
                                         <th>Quantité</th>
                                         <th>Prix unitaire</th>
-                                        <th>Sous-total</th>
+                                        <th>Prix total</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -132,7 +138,7 @@ foreach ($resultats as $row) {
                                 </tbody>
                             </table>
                             <div class="text-end mt-2">
-                                <strong>Total : <?= number_format($info['total'], 2) ?> $</strong>
+                                <strong>Total : <?= number_format($prod['prix'] * $prod['quantite'], 2) ?> $</strong>
                             </div>
                         </div>
                         <div class="card-footer text-end">

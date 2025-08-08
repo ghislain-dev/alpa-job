@@ -29,8 +29,7 @@
 </head>
 <body>
 
-<?php include('navbar_clientt.php'); ?>
-
+<?php include('nav_inter.php'); ?>
 <div class="container py-5">
   <div class="row justify-content-center">
     <div class="col-lg-10 contact-section">
@@ -40,7 +39,7 @@
           <h2 class="contact-header mb-4">📞 Contactez-nous</h2>
           <p>Vous avez des questions ? Nous sommes là pour vous aider.</p>
           <ul class="list-unstyled mt-4">
-            <li class="mb-3"><i class="bi bi-envelope icon"></i><strong>Email :</strong> contact@alpajob.com</li>
+            <li class="mb-3"><i class="bi bi-envelope icon"></i><strong>Email :</strong> alphajobbutembo@gmail.com</li>
             <li class="mb-3"><i class="bi bi-telephone icon"></i><strong>Téléphone :</strong> +243 970 000 000</li>
             <li class="mb-3"><i class="bi bi-geo-alt icon"></i><strong>Adresse :</strong> 123, Avenue de l’Emploi, Butembo</li>
           </ul>

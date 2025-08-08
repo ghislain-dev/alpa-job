@@ -1,5 +1,11 @@
 <?php
 session_start();
+
+// Vérifier si le client est connecté
+if (!isset($_SESSION['email'])) {
+    header("Location: login.php");
+    exit();
+}
 require_once("../connexion/connexion.php");
 
 $id_client = $_SESSION['id'];
@@ -87,76 +93,82 @@ foreach ($resultats as $row) {
             <h4 class="mt-4 text-<?= $statut === 'payée' ? 'success' : 'warning' ?>">
                 <?= ucfirst($statut) ?><?= $statut === 'payée' ? 's' : 's en attente' ?>
             </h4>
-            <?php foreach ($commandes as $id_commande => $info): ?>
-                <div class="card mb-3">
-                    <div class="card-header bg-light">
-                        Commande #<?= $id_commande ?> - <?= date('d/m/Y', strtotime($info['date'])) ?>
-                        <span class="float-end badge bg-<?= $info['statut'] === 'payée' ? 'success' : 'warning' ?>">
-                            <?= ucfirst($info['statut']) ?>
-                        </span>
-                    </div>
-                    <div class="card-body">
-                        <table class="table table-sm">
-                            <thead>
-                            <tr>
-                                <th>Produit</th>
-                                <th>Image</th>
-                                <th>Quantité</th>
-                                <th>Prix unitaire</th>
-                                <th>Sous-total</th>
-                            </tr>
-                            </thead>
-                            <tbody>
-                            <?php foreach ($info['produits'] as $prod): ?>
-                                <tr>
-                                    <td><?= htmlspecialchars($prod['nom']) ?></td>
-                                    <td><img src="../models/controleurs/avatar/<?= htmlspecialchars($prod['image']) ?>" width="60" height="60" style="object-fit: cover;"></td>
-                                    <td><?= $prod['quantite'] ?></td>
-                                    <td><?= number_format($prod['prix'], 2) ?> $</td>
-                                    <td><?= number_format($prod['prix'] * $prod['quantite'], 2) ?> $</td>
-                                </tr>
-                            <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                        <div class="text-end">
-                            <strong>Total : <?= number_format($info['total'], 2) ?> $</strong>
+
+            <div class="row"> <!-- ✅ DEBUT LIGNE -->
+                <?php foreach ($commandes as $id_commande => $info): ?>
+                    <div class="col-md-6"> <!-- ✅ Deux colonnes par ligne -->
+
+                        <div class="card mb-3">
+                            <div class="card-header bg-light">
+                                Commande #<?= $id_commande ?> - <?= date('d/m/Y', strtotime($info['date'])) ?>
+                                <span class="float-end badge bg-<?= $info['statut'] === 'payée' ? 'success' : 'warning' ?>">
+                                    <?= ucfirst($info['statut']) ?>
+                                </span>
+                            </div>
+                            <div class="card-body">
+                                <table class="table table-sm">
+                                    <thead>
+                                        <tr>
+                                            <th>Produit</th>
+                                            <th>Image</th>
+                                            <th>Quantité</th>
+                                            <th>Prix unitaire</th>
+                                            <th>Sous-total</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <?php foreach ($info['produits'] as $prod): ?>
+                                            <tr>
+                                                <td><?= htmlspecialchars($prod['nom']) ?></td>
+                                                <td><img src="../models/controleurs/avatar/<?= htmlspecialchars($prod['image']) ?>" width="60" height="60" style="object-fit: cover;"></td>
+                                                <td><?= $prod['quantite'] ?></td>
+                                                <td><?= number_format($prod['prix'], 2) ?> $</td>
+                                                <td><?= number_format($prod['prix'] * $prod['quantite'], 2) ?> $</td>
+                                            </tr>
+                                        <?php endforeach; ?>
+                                    </tbody>
+                                </table>
+                                <div class="text-end">
+                                    <strong>Total : <?= number_format($info['total'], 2) ?> $</strong>
+                                </div>
+                            </div>
+                            <div class="card-footer text-end">
+                                <?php if ($info['statut'] !== 'payée' && $info['statut'] !== 'livrée'): ?>
+                                    <form action="payer_commande.php" method="POST" style="display:inline;">
+                                        <input type="hidden" name="id_commande" value="<?= $id_commande ?>">
+                                        <button type="submit" class="btn btn-success" name="simulerr">💳 Payer</button>
+                                    </form>
+
+                                    <form action="../models/controleurs/controls_annuler_c.php" method="POST" style="display:inline;" onsubmit="return confirm('Confirmer l\'annulation de cette commande ?');">
+                                        <input type="hidden" name="id_commande" value="<?= $id_commande ?>">
+                                        <button type="submit" class="btn btn-danger ms-2">🗑️ Annuler</button>
+                                    </form>
+                                <?php elseif ($info['statut'] === 'payée' || $info['statut'] === 'livrée'): ?>
+                                    <span class="text-success fw-bold">
+                                        Commande déjà <?= $info['statut'] === 'payée' ? 'payée' : 'livrée' ?>
+                                    </span>
+                                <?php endif; ?>
+                            </div>
                         </div>
-                    </div>
-                <div class="card-footer text-end">
-                <?php if ($info['statut'] !== 'payée' && $info['statut'] !== 'livrée'): ?>
-                    <form action="payer_commande.php" method="POST" style="display:inline;">
-                        <input type="hidden" name="id_commande" value="<?= $id_commande ?>">
-                        <button type="submit" class="btn btn-success" name="simulerr">💳 Payer</button>
-                    </form>
 
-                    <form action="../models/controleurs/controls_annuler_c.php" method="POST" style="display:inline;" onsubmit="return confirm('Confirmer l\'annulation de cette commande ?');">
-                        <input type="hidden" name="id_commande" value="<?= $id_commande ?>">
-                        <button type="submit" class="btn btn-danger ms-2">🗑️ Annuler</button>
-                    </form>
-                    <?php elseif ($info['statut'] === 'payée' || $info['statut'] === 'livrée'): ?>
-                        <span class="text-success fw-bold">
-                            Commande déjà <?= $info['statut'] === 'payée' ? 'payée' : 'livrée' ?>
-                        </span>
-                    <?php endif; ?>
-                </div>
-
-
-                </div>
-            <?php endforeach; ?>
+                    </div> <!-- fin col-md-6 -->
+                <?php endforeach; ?>
+            </div> <!-- ✅ FIN LIGNE -->
         <?php endforeach; ?>
     <?php endif; ?>
-    <?php if ($totalPages > 1): ?>
-    <nav class="mt-4">
-    <ul class="pagination justify-content-center">
-        <?php for ($i = 1; $i <= $totalPages; $i++): ?>
-        <li class="page-item <?= ($i === $pageActuelle) ? 'active' : '' ?>">
-            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
-        </li>
-        <?php endfor; ?>
-    </ul>
-    </nav>
-    <?php endif; ?>
 
+    <?php if ($totalPages > 1): ?>
+        <nav class="mt-4">
+            <ul class="pagination justify-content-center">
+                <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                    <li class="page-item <?= ($i === $pageActuelle) ? 'active' : '' ?>">
+                        <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                    </li>
+                <?php endfor; ?>
+            </ul>
+        </nav>
+    <?php endif; ?>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

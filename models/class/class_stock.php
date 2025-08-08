@@ -8,12 +8,15 @@ class stock {
     }
 
     public function get_vue_stock() {
-        $sql = "SELECT * FROM vue_stock_fifo";
-        $stmt = $this->con->prepare($sql);
-        $stmt->execute();
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        try {
+            $sql = "SELECT * FROM vue_stock_fifo";
+            $stmt = $this->con->prepare($sql);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            // Tu peux loguer l'erreur ici si besoin
+            return [];
+        }
     }
 }
-
-
 ?>

@@ -1,10 +1,26 @@
 <?php 
+session_start();
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de login
+    header("Location: login.php");
+    exit();
+}
+
     require_once("../connexion/connexion.php");
     require_once('../models/class/class_produit.php');
     $db = new connexion();
     $con = $db->getconnexion();
     $affichage = new produit($con);
     $affiche = $affichage->get_produit();
+
+    $recherche = isset($_GET['search']) ? trim($_GET['search']) : '';
+
+    if (!empty($recherche)) {
+        $affiche = $affichage->rechercher_produit($recherche);
+    } else {
+        $affiche = $affichage->get_produit();
+    }
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -47,7 +63,40 @@
         <div class="col-md-8 col-lg-9 p-4">
             <main>
             <div class="container mt-4">
-                
+                <?php if (isset($_GET['message'])): ?>
+                    <?php
+                        $message = $_GET['message'];
+                        $alertType = 'info'; // par défaut
+
+                        // Choisir le type d'alerte selon le message
+                        switch ($message) {
+                            case 'ajoute':
+                                $alertType = 'success';
+                                $texte = "Produit ajouté avec succès.";
+                                break;
+                            case 'modifie':
+                                $alertType = 'success';
+                                $texte = "Produit modifié avec succès.";
+                                break;
+                            case 'supprime':
+                                $alertType = 'success';
+                                $texte = "Produit supprimé avec succès.";
+                                break;
+                            case 'erreur':
+                                $alertType = 'danger';
+                                $texte = "Une erreur s'est produite, veuillez réessayer.";
+                                break;
+                            default:
+                                $texte = htmlspecialchars($message); // Affiche brut si message inconnu
+                                break;
+                        }
+                    ?>
+                    <div class="alert alert-<?= $alertType ?> text-center alert-dismissible fade show mt-2 mb-3" role="alert">
+                        <?= $texte ?>
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fermer"></button>
+                    </div>
+                <?php endif; ?>
+
                 <div class="row mb-3">
                 <div class="col text-end">
                     <button type="button" class="btn btn-primary" id="btnAddProduit" data-bs-toggle="modal" data-bs-target="#produitModal">
@@ -73,6 +122,15 @@
                     <h6 class="mb-0">Liste des produits</h6>    
                     </div>
                     <div class="card-body">
+                        <!-- Formulaire de recherche -->
+                        <form method="get" class="d-flex mb-3" style="max-width: 400px;">
+                            <input type="text" name="search" class="form-control me-2" placeholder="🔍 Rechercher un produit..." value="<?= htmlspecialchars($recherche) ?>">
+                            <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+                            <?php if (!empty($recherche)): ?>
+                                <a href="produit.php" class="btn btn-outline-secondary ms-2">Réinitialiser</a>
+                            <?php endif; ?>
+                        </form>
+
                     <div class="table-responsive">
                         <table class="table table-bordered text-center align-middle">
                         <thead class="table-primary">
@@ -93,7 +151,7 @@
                             <td><?= $aff['nom_produit'] ?></td>
                             <td>
                                 <?php if(!empty($aff['image'])): ?>
-                                <img src="../uploads/<?= $aff['image'] ?>" alt="" width="60">
+                                <img src="../models/controleurs/avatar/<?= $aff['image'] ?>" alt="" width="60">
                                 <?php endif; ?>
                             </td>
                             <td><?= $aff['nom_categorie'] ?></td>
@@ -158,15 +216,16 @@
                     </div>
                     <div class="mb-3">
                     <label class="form-label">Prix :</label>
-                    <select class="form-select" name="idprix" id="produitPrix" required>
-                        <option value="">Sélectionner un prix</option>
-                        <?php 
-                        $prixs = $affichage->get_prix();
-                        foreach($prixs as $prix){
-                            echo "<option value='{$prix['id_prix']}'>{$prix['montant']}</option>";
-                        }
-                        ?>
-                    </select>
+                  <select class="form-select" name="idprix" id="produitPrix" required>
+                    <option value="">Sélectionner un prix</option>
+                    <?php 
+                    $prixs = $affichage->get_prix();  // ⚠ ici il faut appeler la bonne méthode : get_prix()
+                    foreach($prixs as $prix){
+                        echo "<option value='{$prix['id_prix']}'>{$prix['montant']}</option>";
+                    }
+                    ?>
+                </select>
+
                     </div>
                 </div>
                 <div class="modal-footer">
@@ -208,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('produitCategorie').value = this.dataset.idcategorie;
             document.getElementById('produitPrix').value = this.dataset.idprix;
             document.getElementById('imagePreview').innerHTML = this.dataset.image 
-                ? `<img src="../uploads/${this.dataset.image}" alt="Image actuelle" class="img-thumbnail" width="120">` 
+                ? `<img src="../models/controleurs/avatar/${this.dataset.image}" alt="Image actuelle" class="img-thumbnail" width="120">` 
                 : "";
         });
     });

@@ -1,4 +1,11 @@
 <?php
+session_start();
+if (!isset($_SESSION['email']) || $_SESSION['role'] !== 'admin') {
+    // Redirige vers la page de login
+    header("Location: login.php");
+    exit();
+}
+
 require_once('../connexion/connexion.php');
 require_once('../models/class/class_user.php');
 
@@ -7,6 +14,14 @@ $con = $db->getconnexion();
 $user = new user($con);
 $utilisateurs = $user->get_user();
 $fonctions = $user->get_fonction();
+
+$recherche = isset($_GET['search']) ? trim($_GET['search']) : '';
+if (!empty($recherche)) {
+    $utilisateurs = $user->chercher_utilisateur($recherche);
+} else {
+    $utilisateurs = $user->get_user();
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="fr">
@@ -23,7 +38,7 @@ $fonctions = $user->get_fonction();
 <div class="container-fluid bg-light ">
 <div class="row align-items-center">
     <?php require_once('nav_admin.php') ?>
-    <div class="">
+    <div class="col-md-10 p-4">
 
     <!-- Messages de succès -->
     <div class="message">
@@ -60,6 +75,16 @@ $fonctions = $user->get_fonction();
 
     <!-- Bouton pour ouvrir la modale d'ajout -->
     <button class="btn btn-primary mb-3" data-bs-toggle="modal" data-bs-target="#modalAdd">➕ Ajouter un utilisateur</button>
+   <!-- Formulaire de recherche -->
+  <form method="get" class="mb-3 d-flex" style="max-width: 400px;">
+      <input type="text" name="search" class="form-control me-2" placeholder="🔍 Rechercher par nom ou email" value="<?= htmlspecialchars($recherche) ?>">
+      <button type="submit" class="btn btn-outline-primary">Rechercher</button>
+  </form>
+
+    <?php if (!empty($recherche)): ?>
+      <a href="ta_page.php" class="btn btn-sm btn-secondary mb-3">🔄 Réinitialiser</a>
+  <?php endif; ?>
+
 
     <!-- Tableau -->
     <table class="table table-bordered text-center align-middle">

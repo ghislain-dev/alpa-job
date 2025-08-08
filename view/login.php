@@ -75,10 +75,11 @@
 <body>
 
   <!-- NAVBAR -->
-  <?php include_once('navbar_client.php'); ?>
+  <?php include_once('nav_inter.php'); ?>
 
   <!-- Alerte d'erreur -->
   <div id="error-alert" class="alert">
+    <>
     <button class="close-btn" onclick="closeAlert()">×</button>
     <i class="fas fa-exclamation-triangle icon"></i>
     <span id="alert-message"></span>
@@ -92,6 +93,8 @@
     </div>
     
     <form id="loginForm" method="post" action="../models/controleurs/controls_login.php">
+     
+
       <div class="mb-3">
         <label for="username" class="form-label">Nom d'utilisateur</label>
         <div class="input-group">

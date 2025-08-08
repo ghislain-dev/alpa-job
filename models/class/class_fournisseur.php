@@ -1,77 +1,82 @@
 <?php
-    class fournisseur {
-        private $id;
-        private $nom;
-        private $numero;
-        private $email;
-        private $con;
+class fournisseur {
+    private $id;
+    private $nom;
+    private $numero;
+    private $email;
+    private $con;
 
-        public function __construct($con){
-            $this->con=$con;
-        }
+    public function __construct($con) {
+        $this->con = $con;
+    }
 
-        //declararion des accesseurq 
+    // Déclaration des accesseurs
+    public function set_id($id): void { $this->id = $id; }
+    public function set_nom($nom): void { $this->nom = $nom; }
+    public function set_numero($numero): void { $this->numero = $numero; }
+    public function set_email($email): void { $this->email = $email; }
 
-        public function set_id($id) : void{$this->id=$id;}
-        public function set_nom($nom) : void{$this->nom=$nom;}
-        public function set_numero($numero) : void{$this->numero=$numero;}
-        public function set_email($email) : void{$this->email=$email;}
-
-        //declaration d'une methode 
-
-        public function add_fournisseur() : bool{
-            $query ="INSERT INTO fournisseur(`noms`, `numero`, `email`) values(?,?,?)";
-            $stmt =$this->con->prepare($query);
-            if($stmt->execute([$this->nom,$this->numero,$this->email])){
-                return true;
-            }
+    // Ajouter un fournisseur
+    public function add_fournisseur(): bool {
+        try {
+            $query = "INSERT INTO fournisseur (`noms`, `numero`, `email`) VALUES (?, ?, ?)";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->nom, $this->numero, $this->email]);
+        } catch (PDOException $e) {
             return false;
-        }
-        
-        public function update_fournisseur() :bool{
-            $query="UPDATE fournisseur set noms =?,`numero`=?,`email`=?  where id_fournisseur=?";
-            $stmt=$this->con->prepare($query);
-            if($stmt->execute([$this->nom,$this->numero,$this->email,$this->id])){
-                return true;
-            }
-            return false;
-        }
-
-        public function get_fournisseur() :array{
-            $query= "SELECT * FROM fournisseur";
-            $stmt=$this->con->prepare($query);
-            $stmt->execute([]);
-
-            $data =[];
-
-            while($dat=$stmt->fetch()){
-                $data[]= $dat;
-            }
-            return $data;
-        }
-
-        public function delete_fournisseur(){
-            $query="DELETE FROM fournisseur where id_fonction =?";
-            $stmt=$this->con->prepare($query);
-            $stmt->execute([$this->id]);
-            
-            $donnes =[];
-            while($data =$stmt->fetch()){
-                $donnes []=$data;
-            }
-            return $donnes;
-        }
-
-        public function get_fournisseur_by_id($id){
-            $query="SELECT * FROM fournisseur WHERE id_fournisseur =? ";
-            $stmt =$this->con->prepare($query);
-            $stmt->execute([$id]);
-    
-            $donnes =[];
-            while($data =$stmt->fetch()){
-                $donnes [] =$data;
-            }
-            return $donnes;
         }
     }
+
+    // Modifier un fournisseur
+    public function update_fournisseur(): bool {
+        try {
+            $query = "UPDATE fournisseur SET noms = ?, numero = ?, email = ? WHERE id_fournisseur = ?";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->nom, $this->numero, $this->email, $this->id]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    // Récupérer tous les fournisseurs
+    public function get_fournisseur(): array {
+        try {
+            $query = "SELECT * FROM fournisseur";
+            $stmt = $this->con->prepare($query);
+            $stmt->execute();
+
+            $data = [];
+            while ($dat = $stmt->fetch(PDO::FETCH_ASSOC)) {
+                $data[] = $dat;
+            }
+            return $data;
+        } catch (PDOException $e) {
+            return [];
+        }
+    }
+
+    // Supprimer un fournisseur
+    public function delete_fournisseur(): bool {
+        try {
+            $query = "DELETE FROM fournisseur WHERE id_fournisseur = ?";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->id]);
+        } catch (PDOException $e) {
+            return false;
+        }
+    }
+
+    // Récupérer un fournisseur par ID
+    public function get_fournisseur_by_id($id): ?array {
+        try {
+            $query = "SELECT * FROM fournisseur WHERE id_fournisseur = ?";
+            $stmt = $this->con->prepare($query);
+            $stmt->execute([$id]);
+            $data = $stmt->fetch(PDO::FETCH_ASSOC);
+            return $data ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
+    }
+}
 ?>

@@ -24,65 +24,75 @@ class salle {
     public function set_image($image): void { $this->image = $image; }
 
     public function add_salle(): bool {
-        $query = "INSERT INTO salle (nom_salle, description, capacite, prix, disponible, photo) VALUES (?, ?, ?, ?, ?, ?)";
-        $stmt = $this->con->prepare($query);
-        return $stmt->execute([
-            $this->nom,
-            $this->description,
-            $this->capacite,
-            $this->prix,
-            $this->disponible,
-            $this->image
-        ]);
+        try {
+            $query = "INSERT INTO salle (nom_salle, description, capacite, prix, disponible, photo) 
+                      VALUES (?, ?, ?, ?, ?, ?)";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([
+                $this->nom, $this->description, $this->capacite,
+                $this->prix, $this->disponible, $this->image
+            ]);
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
     public function update_salle(): bool {
-        // Met à jour la photo uniquement si une nouvelle image est fournie
-        if ($this->image !== null) {
-            $query = "UPDATE salle SET nom_salle = ?, description = ?, capacite = ?, prix = ?, disponible = ?, photo = ? WHERE id_salle = ?";
-            $stmt = $this->con->prepare($query);
-            return $stmt->execute([
-                $this->nom,
-                $this->description,
-                $this->capacite,
-                $this->prix,
-                $this->disponible,
-                $this->image,
-                $this->id
-            ]);
-        } else {
-            // Pas de nouvelle image, on ne modifie pas la colonne photo
-            $query = "UPDATE salle SET nom_salle = ?, description = ?, capacite = ?, prix = ?, disponible = ? WHERE id_salle = ?";
-            $stmt = $this->con->prepare($query);
-            return $stmt->execute([
-                $this->nom,
-                $this->description,
-                $this->capacite,
-                $this->prix,
-                $this->disponible,
-                $this->id
-            ]);
+        try {
+            if ($this->image !== null) {
+                $query = "UPDATE salle 
+                          SET nom_salle = ?, description = ?, capacite = ?, prix = ?, disponible = ?, photo = ?
+                          WHERE id_salle = ?";
+                $stmt = $this->con->prepare($query);
+                return $stmt->execute([
+                    $this->nom, $this->description, $this->capacite,
+                    $this->prix, $this->disponible, $this->image, $this->id
+                ]);
+            } else {
+                $query = "UPDATE salle 
+                          SET nom_salle = ?, description = ?, capacite = ?, prix = ?, disponible = ?
+                          WHERE id_salle = ?";
+                $stmt = $this->con->prepare($query);
+                return $stmt->execute([
+                    $this->nom, $this->description, $this->capacite,
+                    $this->prix, $this->disponible, $this->id
+                ]);
+            }
+        } catch (PDOException $e) {
+            return false;
         }
     }
 
     public function get_salle(): array {
-        $query = "SELECT * FROM salle";
-        $stmt = $this->con->prepare($query);
-        $stmt->execute();
-        return $stmt->fetchAll();
+        try {
+            $query = "SELECT * FROM salle";
+            $stmt = $this->con->prepare($query);
+            $stmt->execute();
+            return $stmt->fetchAll(PDO::FETCH_ASSOC);
+        } catch (PDOException $e) {
+            return [];
+        }
     }
 
     public function delete_salle(): bool {
-        $query = "DELETE FROM salle WHERE id_salle = ?";
-        $stmt = $this->con->prepare($query);
-        return $stmt->execute([$this->id]);
+        try {
+            $query = "DELETE FROM salle WHERE id_salle = ?";
+            $stmt = $this->con->prepare($query);
+            return $stmt->execute([$this->id]);
+        } catch (PDOException $e) {
+            return false;
+        }
     }
 
-    public function get_user_by_id($id): array {
-        $query = "SELECT * FROM salle WHERE id_salle = ?";
-        $stmt = $this->con->prepare($query);
-        $stmt->execute([$id]);
-        return $stmt->fetchAll();
+    public function get_user_by_id($id): ?array {
+        try {
+            $query = "SELECT * FROM salle WHERE id_salle = ?";
+            $stmt = $this->con->prepare($query);
+            $stmt->execute([$id]);
+            return $stmt->fetch(PDO::FETCH_ASSOC) ?: null;
+        } catch (PDOException $e) {
+            return null;
+        }
     }
 }
 ?>
